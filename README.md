@@ -18,7 +18,10 @@
 
     <div class="row">
       <label>Broker URL (WebSockets):</label>
-      <input id="url" style="width: 380px" value="ws://192.168.10.124:9001/mqtt" />
+      <input id="url" style="width: 380px" placeholder="wss://<your-id>.ngrok-free.app" value="wss://<your-id>.ngrok-free.app" />
+    </div>
+    <div class="row" style="font-size: 12px; color: #555;">
+      Tip: Run ngrok on your PC: ngrok http 9001, then use the HTTPS domain shown as wss:// in this field.
     </div>
     <div class="row">
       <label>Username:</label>
@@ -65,19 +68,41 @@
         statusEl.className = good ? 'ok' : 'bad';
       }
 
+      // Load saved settings
+      (function restoreSaved(){
+        try {
+          const saved = JSON.parse(localStorage.getItem('mqttCfg')||'{}');
+          if (saved.url) document.getElementById('url').value = saved.url;
+          if (saved.user) document.getElementById('user').value = saved.user;
+          if (saved.pass) document.getElementById('pass').value = saved.pass;
+        } catch {}
+      })();
+
       document.getElementById('connect').onclick = () => {
         const url = document.getElementById('url').value.trim();
         const username = document.getElementById('user').value.trim();
         const password = document.getElementById('pass').value;
+
+        // Block mixed content: if page is https, require wss
+        if (location.protocol === 'https:' && url.startsWith('ws://')) {
+          setStatus('This page is HTTPS. Use wss:// for the broker URL (e.g., your ngrok HTTPS domain).', false);
+          log('Blocked mixed content: change ws:// to wss://', 'bad');
+          return;
+        }
 
         if (client) try { client.end(true); } catch(e) {}
 
         const options = {
           protocolVersion: 5,
           clean: true,
-          reconnectPeriod: 2000
+          reconnectPeriod: 2000,
+          keepalive: 60,
+          clientId: 'web_' + Math.random().toString(16).slice(2)
         };
         if (username) { options.username = username; options.password = password; }
+
+        // Save settings
+        try { localStorage.setItem('mqttCfg', JSON.stringify({ url, user: username, pass: password })); } catch {}
 
         log(`Connecting to ${url} ...`);
         client = mqtt.connect(url, options);
