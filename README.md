@@ -18,7 +18,7 @@
 
     <div class="row">
       <label>Broker URL (WebSockets):</label>
-      <input id="url" style="width: 380px" value="ws://192.168.10.124:1883/mqtt" />
+      <input id="url" style="width: 380px" value="ws://192.168.10.124:9001/mqtt" />
     </div>
     <div class="row">
       <label>Username:</label>
