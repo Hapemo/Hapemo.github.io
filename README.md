@@ -18,10 +18,10 @@
 
     <div class="row">
       <label>Broker URL (WebSockets):</label>
-      <input id="url" style="width: 380px" placeholder="wss://<your-id>.ngrok-free.app" value="wss://<your-id>.ngrok-free.app" />
+      <input id="url" style="width: 380px" placeholder="ws://213.35.104.234:9001" value="ws://213.35.104.234:9001" />
     </div>
     <div class="row" style="font-size: 12px; color: #555;">
-      Tip: Run ngrok on your PC: ngrok http 9001, then use the HTTPS domain shown as wss:// in this field.
+      Tip: Run ngrok on your PC: ngrok http 9001, then use the HTTPS domain shown as ws:// in this field.
     </div>
     <div class="row">
       <label>Username:</label>
@@ -82,13 +82,6 @@
         const url = document.getElementById('url').value.trim();
         const username = document.getElementById('user').value.trim();
         const password = document.getElementById('pass').value;
-
-        // Block mixed content: if page is https, require wss
-        if (location.protocol === 'https:' && url.startsWith('ws://')) {
-          setStatus('This page is HTTPS. Use wss:// for the broker URL (e.g., your ngrok HTTPS domain).', false);
-          log('Blocked mixed content: change ws:// to wss://', 'bad');
-          return;
-        }
 
         if (client) try { client.end(true); } catch(e) {}
 
