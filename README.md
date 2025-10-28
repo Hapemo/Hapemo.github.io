@@ -83,6 +83,13 @@
         const username = document.getElementById('user').value.trim();
         const password = document.getElementById('pass').value;
 
+        // Block mixed content: if page is https, require wss
+        if (location.protocol === 'https:' && url.startsWith('ws://')) {
+          setStatus('This page is HTTPS. Use wss:// for the broker URL (e.g., your ngrok HTTPS domain).', false);
+          log('Blocked mixed content: change ws:// to wss://', 'bad');
+          return;
+        }
+
         if (client) try { client.end(true); } catch(e) {}
 
         const options = {
